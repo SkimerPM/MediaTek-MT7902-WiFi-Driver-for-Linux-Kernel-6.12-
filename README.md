@@ -14,7 +14,14 @@ This repository contains a heavily refactored version of the MT76 stack with sur
 - Modernized the Netmem / Page Pool APIs for kernel 6.12+ compatibility.
 - Replaced deprecated timer macros (e.g. `timer_container_of` to `from_timer`).
 - Patched mismatched `ieee80211_ops` callback signatures (removed upstream `radio_idx` and `link_id` parameter changes).
-- Full `dkms.conf` support for automatic rebuilds on kernel updates.
+- **Performance Fix (MIMO 2x2):** Forced `antenna_mask=3` to enable both physical antennas, significantly improving signal strength (-81dBm to -69dBm) and TX bitrates.
+- **Bluetooth Support:** Integrated patched `btusb` and `btmtk` modules for full Bluetooth 5.2 functionality on Kernel 6.12.
+- Full `dkms.conf` support for automatic rebuilds on kernel updates (WiFi + BT).
+
+## 🏆 Acknowledgments / Créditos
+Este proyecto no hubiese sido posible del todo si no hubiese sido por la asistencia de **Antigravity (IA)**, quien ayudó a depurar, modernizar y parchear quirúrgicamente el código para los kernels más modernos de Linux.
+
+También agradecimiento especial a [abdullaabdullazade](https://github.com/abdullaabdullazade/mt7902_driver) por los parches base de Bluetooth.
 
 ## 🚀 Installation (The DKMS Way - Highly Recommended)
 
