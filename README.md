@@ -18,10 +18,10 @@ This repository contains a heavily refactored version of the MT76 stack with sur
 - **Bluetooth Support:** Integrated patched `btusb` and `btmtk` modules for full Bluetooth 5.2 functionality on Kernel 6.12.
 - Full `dkms.conf` support for automatic rebuilds on kernel updates (WiFi + BT).
 
-## 🏆 Acknowledgments / Créditos
-Este proyecto no hubiese sido posible del todo si no hubiese sido por la asistencia de **Antigravity (IA)**, quien ayudó a depurar, modernizar y parchear quirúrgicamente el código para los kernels más modernos de Linux.
+## 🏆 Acknowledgments
+This project would not have been possible without the assistance of **Antigravity (AI)**, who helped debug, modernize, and surgically patch the code for the most modern Linux kernels.
 
-También agradecimiento especial a [abdullaabdullazade](https://github.com/abdullaabdullazade/mt7902_driver) por los parches base de Bluetooth.
+Special thanks also to [abdullaabdullazade](https://github.com/abdullaabdullazade/mt7902_driver) for the base Bluetooth patches.
 
 ## 🚀 Installation (The DKMS Way - Highly Recommended)
 
