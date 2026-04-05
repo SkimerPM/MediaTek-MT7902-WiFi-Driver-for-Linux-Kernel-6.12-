@@ -4,6 +4,7 @@ obj-m += mt76.o
 obj-m += mt76-connac-lib.o
 obj-m += mt792x-lib.o
 obj-m += mt7921/
+obj-m += bluetooth/
 
 .PHONY: all clean module_compile module_compress module_install
 
