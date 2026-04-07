@@ -547,7 +547,12 @@ static void mt7921_mcu_parse_phy_cap(struct mt76_dev *dev,
 
 	cap = (struct mt7921_phy_cap *)skb->data;
 
-	dev->phy.antenna_mask = 3; /* Forzar ambas antenas para solucionar cable cruzado MAIN/AUX */
+	/* MT7902: Firmware reports NSS=1 but the hardware has two physical
+	 * antenna chains. Force both chains (mask=3) to enable 2x2 MIMO and
+	 * ensure the correct antenna port is active regardless of MAIN/AUX
+	 * cable routing on the laptop PCB.
+	 */
+	dev->phy.antenna_mask = 3;
 	dev->phy.chainmask = 3;
 	dev->phy.cap.has_2ghz = cap->hw_path & BIT(WF0_24G);
 	dev->phy.cap.has_5ghz = cap->hw_path & BIT(WF0_5G);
