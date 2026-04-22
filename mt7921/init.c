@@ -314,7 +314,11 @@ int mt7921_register_device(struct mt792x_dev *dev)
 	if (!mt76_is_mmio(&dev->mt76))
 		hw->extra_tx_headroom += MT_SDIO_TXD_SIZE + MT_SDIO_HDR_SIZE;
 
-	mt792x_init_acpi_sar(dev);
+	/* Disable ACPI SAR: the laptop BIOS provides overly restrictive SAR
+	 * limits (~3 dBm) that make WiFi unusable at normal distances.
+	 * The firmware's internal power tables already respect regulatory limits.
+	 */
+	/* mt792x_init_acpi_sar(dev); */
 
 	ret = mt792x_init_wcid(dev);
 	if (ret)

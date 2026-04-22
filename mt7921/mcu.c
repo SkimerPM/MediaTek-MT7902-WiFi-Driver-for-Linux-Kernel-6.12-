@@ -488,7 +488,17 @@ static int mt7921_load_clc(struct mt792x_dev *dev, const char *fw_name)
 			goto out;
 		}
 	}
-	ret = mt7921_mcu_set_clc(dev, "00", ENVIRON_INDOOR);
+	/* Use the already-configured regulatory domain alpha2 so the firmware
+	 * applies the correct per-country TX power table from the start.
+	 * Defaulting to "00" (world) caps TX power to ~3 dBm even when a real
+	 * country was set via iw/crda before the driver loaded.
+	 * Fall back to "00" only when no valid country is configured yet.
+	 */
+	if (dev->mt76.alpha2[0] != 0 && dev->mt76.alpha2[0] != '0' &&
+	    dev->mt76.alpha2[1] != 0 && dev->mt76.alpha2[1] != '0')
+		ret = mt7921_mcu_set_clc(dev, dev->mt76.alpha2, ENVIRON_INDOOR);
+	else
+		ret = mt7921_mcu_set_clc(dev, "00", ENVIRON_INDOOR);
 out:
 	release_firmware(fw);
 
