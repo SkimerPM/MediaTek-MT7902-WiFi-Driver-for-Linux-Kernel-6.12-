@@ -32,7 +32,7 @@ If you want to quickly fix your WiFi and Bluetooth on any modern kernel, follow 
    *The script is **interactive** — it will auto-detect your country and confirm each step before doing anything.*
 
 ### 📖 What this script does:
-* **Distro detection:** Supports Debian / Ubuntu / Mint **and** Arch / Manjaro / EndeavourOS / CachyOS / Garuda automatically.
+* **Distro detection:** Supports **any Debian-based** distro (Debian, Ubuntu, Mint, Pop!_OS, Zorin, etc.) and **any Arch-based** distro (Arch, Manjaro, EndeavourOS, Garuda, CachyOS, etc.) automatically.
 * **Installs via DKMS:** Driver is registered with DKMS — it **auto-recompiles after every kernel update**. No manual action needed.
 * **Regulatory domain (country code):** Sets the legal WiFi channel and power limits for your country. Auto-detected from your system locale. Persists across reboots.
 * **Bluetooth firmware fix:** Detects and resolves the known firmware path conflict that prevents BT from initializing.
@@ -64,7 +64,7 @@ Si quieres arreglar rápidamente tu WiFi y Bluetooth en cualquier kernel moderno
    *El script es **interactivo** — detectará tu país automáticamente y te pedirá confirmación antes de instalar.*
 
 ### 📖 ¿Qué hace este script?:
-* **Detección de distribución:** Soporta Debian / Ubuntu / Mint **y** Arch / Manjaro / EndeavourOS automáticamente.
+* **Detección de distribución:** Soporta automáticamente **cualquier distro basada en Debian** (Debian, Ubuntu, Mint, Pop!_OS, Zorin, etc.) y **cualquier distro basada en Arch** (Arch, Manjaro, EndeavourOS, Garuda, CachyOS, etc.).
 * **Instalación vía DKMS:** El driver sobrevive a las actualizaciones. Se **recompilará solo cada vez que actualices el kernel**.
 * **Código de país (Regulatory domain):** Configura los canales WiFi legales y la potencia máxima para tu país, mejorando la señal.
 * **Arreglo de Bluetooth:** Detecta y resuelve el conflicto de firmware que impide que el Bluetooth encienda en este chip.
