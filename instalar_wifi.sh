@@ -238,41 +238,42 @@ configurar_dominio() {
     CODIGO_PAIS="$pais"
 }
 
-# ── Conflicto de firmware Bluetooth ──────────────────────────
-resolver_conflicto_bt() {
+# ── Instalar y Resolver Firmwares ────────────────────────────
+instalar_firmwares() {
+    paso "Instalando todos los firmwares requeridos (WiFi y Bluetooth)..."
+    
+    local fw_base="$DIR_SCRIPT/mt7902_firmware"
+    local fw_latest="$fw_base/latest"
+    
+    info "Copiando archivos de firmware a /lib/firmware/mediatek/..."
+    mkdir -p /lib/firmware/mediatek
+    
+    # Copiar firmwares base
+    if ls "$fw_base"/*.bin* 1> /dev/null 2>&1; then
+        cp "$fw_base"/*.bin* /lib/firmware/mediatek/ 2>/dev/null || true
+    fi
+    # Copiar firmwares recientes (sobrescribe antiguos)
+    if ls "$fw_latest"/*.bin* 1> /dev/null 2>&1; then
+        cp "$fw_latest"/*.bin* /lib/firmware/mediatek/ 2>/dev/null || true
+    fi
+    exito "Firmwares instalados correctamente."
+
     paso "Verificando conflictos de firmware Bluetooth..."
     local fw_conflicto="/lib/firmware/mediatek/mt7902/BT_RAM_CODE_MT7902_1_1_hdr.bin.zst"
-    local fw_correcto="/lib/firmware/mediatek/BT_RAM_CODE_MT7902_1_1_hdr.bin.zst"
+    local fw_conflicto2="/lib/firmware/mediatek/mt7902/BT_RAM_CODE_MT7902_1_1_hdr.bin"
 
-    if [[ -f "$fw_conflicto" ]]; then
-        aviso "Firmware BT conflictivo detectado en: $fw_conflicto"
+    if [[ -f "$fw_conflicto" ]] || [[ -f "$fw_conflicto2" ]]; then
+        aviso "Firmware BT conflictivo detectado en /lib/firmware/mediatek/mt7902/"
         aviso "Esto puede impedir que el Bluetooth funcione correctamente."
         read -rp "  ¿Eliminar el firmware conflictivo? [S/n]: " resp
         if [[ "${resp,,}" != "n" ]]; then
-            rm -f "$fw_conflicto"
+            rm -f "$fw_conflicto" "$fw_conflicto2" 2>/dev/null || true
             exito "Firmware conflictivo eliminado."
         else
             aviso "Omitido — el Bluetooth podría no funcionar correctamente."
         fi
     else
         exito "Sin conflictos de firmware BT."
-    fi
-
-    if [[ ! -f "$fw_correcto" ]]; then
-        aviso "Firmware BT esperado no encontrado: $fw_correcto"
-        info "Buscando en la carpeta del proyecto..."
-        local fw_src="$DIR_SCRIPT/mt7902_firmware"
-        local fw_bin
-        fw_bin=$(find "$fw_src" -name "BT_RAM_CODE_MT7902_1_1_hdr.bin*" 2>/dev/null | head -1)
-        if [[ -n "$fw_bin" ]]; then
-            mkdir -p /lib/firmware/mediatek
-            cp "$fw_bin" /lib/firmware/mediatek/
-            exito "Firmware BT instalado desde la carpeta del proyecto."
-        else
-            aviso "Firmware BT no encontrado. El Bluetooth podría no inicializarse."
-        fi
-    else
-        exito "Firmware BT presente: $fw_correcto"
     fi
 }
 
@@ -452,7 +453,7 @@ echo ""
 info "Este script realizará los siguientes pasos:"
 echo "   1. Instalar herramientas de compilación y DKMS"
 echo "   2. Configurar el dominio regulatorio WiFi (código de país)"
-echo "   3. Resolver conflictos de firmware Bluetooth"
+echo "   3. Instalar firmwares y resolver conflictos BT"
 echo "   4. Compilar e instalar el driver via DKMS (se actualiza solo)"
 echo "   5. Cargar los módulos inmediatamente (sin reiniciar)"
 echo "   6. Verificar que todo funcione correctamente"
@@ -462,7 +463,7 @@ read -rp "¿Continuar? [S/n]: " confirmar
 
 instalar_dependencias
 configurar_dominio
-resolver_conflicto_bt
+instalar_firmwares
 instalar_dkms
 cargar_modulos
 verificar_instalacion
