@@ -283,6 +283,26 @@ install_firmwares() {
     else
         success "No BT firmware conflicts found."
     fi
+
+    # Include BT firmware in initramfs so the chip can find it at early boot
+    step "Ensuring BT firmware is available at early boot (initramfs)..."
+    if $IS_ARCH && command -v dracut &>/dev/null; then
+        info "Arch + dracut detected — embedding BT firmware into initramfs..."
+        mkdir -p /etc/dracut.conf.d
+        cat > /etc/dracut.conf.d/mediatek-bt.conf << 'DRACUTEOF'
+# MediaTek MT7902 Bluetooth firmware — embedded in initramfs
+# ensures the BT chip finds its firmware at early kernel boot time
+install_items+=" /lib/firmware/mediatek/BT_RAM_CODE_MT7902_1_1_hdr.bin "
+install_items+=" /lib/firmware/mediatek/BT_RAM_CODE_MT7902_1_1_hdr.bin.zst "
+DRACUTEOF
+        dracut-rebuild &>/dev/null && success "initramfs rebuilt with BT firmware embedded." \
+            || warn "Could not rebuild initramfs. BT may not work after reboot. Run: sudo dracut-rebuild"
+    elif $IS_DEBIAN && command -v update-initramfs &>/dev/null; then
+        info "Debian system — updating initramfs with BT firmware..."
+        update-initramfs -u -k all &>/dev/null && success "initramfs updated." || true
+    else
+        warn "Could not auto-update initramfs. If BT fails after reboot, run: sudo dracut-rebuild"
+    fi
 }
 
 # ── DKMS installation ─────────────────────────────────────────
@@ -402,10 +422,11 @@ load_modules_now() {
         iw reg set "$COUNTRY_CODE" 2>/dev/null || true
     fi
 
-    # Restart bluetooth service
-    if systemctl is-active --quiet bluetooth; then
-        systemctl restart bluetooth 2>/dev/null || true
-    fi
+    # Enable and start bluetooth service
+    step "Enabling Bluetooth service..."
+    systemctl enable --now bluetooth.service 2>/dev/null \
+        && success "bluetooth.service enabled and started." \
+        || warn "Could not enable bluetooth.service automatically."
 
     success "Modules loaded."
 }

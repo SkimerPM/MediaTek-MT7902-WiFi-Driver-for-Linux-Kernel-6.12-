@@ -275,6 +275,27 @@ instalar_firmwares() {
     else
         exito "Sin conflictos de firmware BT."
     fi
+
+    # Incluir firmware BT en initramfs (Arch/dracut)
+    # Esto garantiza que el firmware esté disponible desde el segundo 1 del arranque
+    paso "Asegurando que el firmware BT esté disponible en el arranque inicial..."
+    if $ES_ARCH && command -v dracut &>/dev/null; then
+        info "Sistema Arch con dracut detectado — incluyendo firmware BT en initramfs..."
+        mkdir -p /etc/dracut.conf.d
+        cat > /etc/dracut.conf.d/mediatek-bt.conf << 'DRACUTEOF'
+# MediaTek MT7902 Bluetooth firmware — incluido en initramfs
+# para garantizar que el chip BT lo encuentre en el arranque temprano
+install_items+=" /lib/firmware/mediatek/BT_RAM_CODE_MT7902_1_1_hdr.bin "
+install_items+=" /lib/firmware/mediatek/BT_RAM_CODE_MT7902_1_1_hdr.bin.zst "
+DRACUTEOF
+        dracut-rebuild &>/dev/null && exito "initramfs reconstruido con firmware BT incluido." \
+            || aviso "No se pudo reconstruir el initramfs. Puede que el BT no funcione hasta reiniciar."
+    elif $ES_DEBIAN && command -v update-initramfs &>/dev/null; then
+        info "Sistema Debian detectado — actualizando initramfs con firmware BT..."
+        update-initramfs -u -k all &>/dev/null && exito "initramfs actualizado." || true
+    else
+        aviso "No se pudo actualizar el initramfs automáticamente. Si el BT falla tras reiniciar, ejecuta: sudo dracut-rebuild"
+    fi
 }
 
 # ── Instalación con DKMS ──────────────────────────────────────
@@ -390,10 +411,11 @@ cargar_modulos() {
         iw reg set "$CODIGO_PAIS" 2>/dev/null || true
     fi
 
-    # Reiniciar bluetooth
-    if systemctl is-active --quiet bluetooth; then
-        systemctl restart bluetooth 2>/dev/null || true
-    fi
+    # Reiniciar / habilitar servicio bluetooth
+    paso "Habilitando servicio Bluetooth..."
+    systemctl enable --now bluetooth.service 2>/dev/null \
+        && exito "Servicio bluetooth.service habilitado y arrancado." \
+        || aviso "No se pudo habilitar bluetooth.service automáticamente."
 
     exito "Módulos cargados correctamente."
 }
