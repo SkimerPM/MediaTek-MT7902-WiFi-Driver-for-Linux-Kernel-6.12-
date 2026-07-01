@@ -507,8 +507,8 @@ echo ""
 read -rp "Continue? [Y/n]: " confirm
 [[ "${confirm,,}" == "n" ]] && { info "Cancelled."; exit 0; }
 
-install_dependencies
-configure_domain
+install_deps
+configure_regdom
 install_firmwares
 install_dkms
 load_modules_now
